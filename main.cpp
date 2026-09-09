@@ -11,7 +11,6 @@
 
 using namespace std;
 
-
 struct Usuario {
     string nombre;
     int presupuesto = 500;
@@ -36,27 +35,26 @@ void mostrarCancha(Usuario* u) {
     cout << "\n======================================================\n";
     cout << "            ALINEACION DE " << u->nombre << " (4-2-3-1)\n";
     cout << "======================================================\n";
-
+    
     if(u->equipo.size() < 11) {
         cout << "[Alineacion en construccion: " << u->equipo.size() << "/11 jugadores]\n";
         return;
     }
 
-
     cout << "                     [" << u->equipo[10]->nombre << "]\n\n";
-
+    
     cout << "   [" << u->equipo[7]->nombre << "]     [" << u->equipo[8]->nombre << "]     [" << u->equipo[9]->nombre << "]\n\n";
- 
+    
     cout << "             [" << u->equipo[5]->nombre << "]       [" << u->equipo[6]->nombre << "]\n\n";
-   
+    
     cout << "[" << u->equipo[1]->nombre << "]  [" << u->equipo[2]->nombre << "]  [" << u->equipo[3]->nombre << "]  [" << u->equipo[4]->nombre << "]\n\n";
-   
+    
     cout << "                     [" << u->equipo[0]->nombre << "]\n";
     cout << "======================================================\n\n";
 }
 
 Usuario* iniciarSubasta(Jugador* j, Usuario* u1, Usuario* u2) {
-    int precioBase = (j->media > 85) ? (rand() % 41 + 60) : (rand() % 76 + 5); /
+    int precioBase = (j->media > 85) ? (rand() % 41 + 60) : (rand() % 76 + 5);
     int ofertaActual = 0;
     Usuario* maxPostor = nullptr;
     
@@ -98,7 +96,7 @@ Usuario* iniciarSubasta(Jugador* j, Usuario* u1, Usuario* u2) {
                         ofertaActual = precioBase;
                         maxPostor = postorIntento;
                         cout << postorIntento->nombre << " iguala el precio base de " << precioBase << "M.\n";
-                        inicio = chrono::steady_clock::now(); // Reinicia cronómetro
+                        inicio = chrono::steady_clock::now();
                     } else {
                         cout << "Fondos insuficientes para el precio base.\n";
                     }
@@ -111,7 +109,7 @@ Usuario* iniciarSubasta(Jugador* j, Usuario* u1, Usuario* u2) {
                         ofertaActual += aumento;
                         maxPostor = postorIntento;
                         cout << postorIntento->nombre << " sube la oferta a " << ofertaActual << "M!\n";
-                        inicio = chrono::steady_clock::now(); // Reinicia cronómetro
+                        inicio = chrono::steady_clock::now();
                     } else {
                         cout << "Monto invalido o fondos insuficientes. La subasta continua...\n";
                     }
@@ -136,7 +134,6 @@ Usuario* iniciarSubasta(Jugador* j, Usuario* u1, Usuario* u2) {
 int main() {
     srand(time(NULL));
     
-    // Configuración Inicial
     Usuario u1, u2;
     u1.tecla = 'e';
     u2.tecla = 'p';
@@ -150,7 +147,7 @@ int main() {
     cin >> u2.nombre;
 
     vector<Jugador*> todosLosJugadores;
-    // IMPORTANTE: Asegúrate de tener el archivo "jugadores.csv" en la misma carpeta
+    
     cargarJugadores("jugadores.csv", todosLosJugadores); 
 
     if (todosLosJugadores.empty()) {
@@ -158,12 +155,10 @@ int main() {
         return 1;
     }
 
-    // Para simplificar, simulamos un pool de 22 jugadores al azar (11 para cada uno)
-    // En un sistema avanzado, filtrarías por posiciones específicas.
     cout << "\nPreparando la subasta de 22 jugadores estelares...\n\n";
 
     for (int i = 0; i < 22; i++) {
-        // Validación de quiebra
+        
         if (u1.presupuesto <= 0 && u1.equipo.size() < 11) {
             cout << u1.nombre << " se quedo sin dinero y no pudo completar su 11! PIERDE AUTOMATICAMENTE.\n";
             return 0;
@@ -173,25 +168,21 @@ int main() {
             return 0;
         }
 
-        // Obtener jugador aleatorio
         int indiceRandom = rand() % todosLosJugadores.size();
         Jugador* jSubasta = todosLosJugadores[indiceRandom];
 
-        // Se ejecuta la subasta
         Usuario* ganador = iniciarSubasta(jSubasta, &u1, &u2);
         
         if (ganador) {
             ganador->equipo.push_back(jSubasta);
         } else {
-            // Si nadie lo compra, repetimos el ciclo para asegurar que completen los 22 fichajes
             i--; 
         }
         
-        system("pause"); // Pausa antes del siguiente jugador
-        system("cls"); // Limpia consola (En Windows)
+        system("pause");
+        system("cls");
     }
 
-    // FASE FINAL: Muestra de canchas y Enfrentamiento
     mostrarCancha(&u1);
     mostrarCancha(&u2);
 
